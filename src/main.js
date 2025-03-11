@@ -7,11 +7,30 @@ const API_KEY = 'live_ObhKAQTiehStNYDlSLfGYeA4E31qnpEPZmEks4TgPD6IgdiyCs6MQCO1AI
 const paginaPrincipal = document.getElementById('paginaPrincipal');
 const galeriaPerros = document.getElementById('galeriaPerros');
 const contenedorGaleria = document.getElementById('contenedorGaleria');
-const searchInput = document.getElementById('searchInput');
-const clearSearch = document.getElementById('clearSearch');
 
-// Almacenar todas las tarjetas de perros
+// Variables para el buscador
+let searchInput;
+let clearSearch;
 let todasLasTarjetas = [];
+
+// Inicializar elementos del buscador
+function inicializarBuscador() {
+    searchInput = document.getElementById('searchInput');
+    clearSearch = document.getElementById('clearSearch');
+
+    if (searchInput && clearSearch) {
+        // Event listener para el input de búsqueda
+        searchInput.addEventListener('input', (e) => {
+            filtrarTarjetas(e.target.value);
+        });
+
+        // Event listener para el botón de limpiar búsqueda
+        clearSearch.addEventListener('click', () => {
+            searchInput.value = '';
+            filtrarTarjetas('');
+        });
+    }
+}
 
 /*
  * Función principal que obtiene y muestra una imagen aleatoria de perro
@@ -174,33 +193,53 @@ function mostrarDetallesRaza(breed) {
 
 // Función para filtrar las tarjetas según el término de búsqueda
 function filtrarTarjetas(searchTerm) {
+    // Convertir el término de búsqueda a minúsculas y eliminar espacios en blanco
     const termino = searchTerm.toLowerCase().trim();
+    console.log('Filtrando por:', termino);
     
-    todasLasTarjetas.forEach(tarjeta => {
-        const nombreRaza = tarjeta.querySelector('.card-title').textContent.toLowerCase();
-        if (nombreRaza.includes(termino)) {
-            tarjeta.parentElement.classList.remove('hidden');
+    // Obtener todas las tarjetas del contenedor
+    const tarjetas = document.querySelectorAll('.col-md-6');
+    console.log('Número de tarjetas encontradas:', tarjetas.length);
+    
+    let tarjetasEncontradas = 0;
+    
+    tarjetas.forEach(tarjeta => {
+        // Obtener el texto del título y convertirlo a minúsculas
+        const nombreRaza = tarjeta.querySelector('.card-title')?.textContent?.toLowerCase() || '';
+        
+        // Comprobar si el término está vacío o si el nombre contiene el término
+        if (termino === '' || nombreRaza.includes(termino)) {
+            tarjeta.style.display = '';
+            tarjetasEncontradas++;
         } else {
-            tarjeta.parentElement.classList.add('hidden');
+            tarjeta.style.display = 'none';
         }
     });
+    
+    console.log('Tarjetas mostradas:', tarjetasEncontradas);
+    
+    // Mostrar mensaje si no hay resultados
+    const mensajeNoResultados = document.getElementById('mensajeNoResultados');
+    if (!mensajeNoResultados) {
+        const mensaje = document.createElement('div');
+        mensaje.id = 'mensajeNoResultados';
+        mensaje.className = 'col-12 text-center mt-4';
+        contenedorGaleria.appendChild(mensaje);
+    }
+    
+    const mensajeElement = document.getElementById('mensajeNoResultados');
+    if (tarjetasEncontradas === 0 && termino !== '') {
+        mensajeElement.innerHTML = `<p class="text-muted">No se encontraron razas que coincidan con "${searchTerm}"</p>`;
+        mensajeElement.style.display = 'block';
+    } else {
+        mensajeElement.style.display = 'none';
+    }
 }
-
-// Event listener para el input de búsqueda
-searchInput.addEventListener('input', (e) => {
-    filtrarTarjetas(e.target.value);
-});
-
-// Event listener para el botón de limpiar búsqueda
-clearSearch.addEventListener('click', () => {
-    searchInput.value = '';
-    filtrarTarjetas('');
-});
 
 // Función para obtener y mostrar la galería de perros
 async function cargarGaleria() {
     try {
-        const respuesta = await fetch('https://api.thedogapi.com/v1/images/search?has_breeds=1&limit=12', {
+        const respuesta = await fetch('https://api.thedogapi.com/v1/images/search?has_breeds=1&limit=20', {
             headers: {
                 'x-api-key': API_KEY
             }
@@ -208,16 +247,46 @@ async function cargarGaleria() {
         const perros = await respuesta.json();
         
         contenedorGaleria.innerHTML = '';
-        todasLasTarjetas = []; // Limpiar el array de tarjetas
         
         perros.forEach(perro => {
             if (perro.breeds && perro.breeds.length > 0) {
                 const raza = perro.breeds[0];
                 const tarjeta = crearTarjetaPerro(perro.url, raza.name, raza);
                 contenedorGaleria.appendChild(tarjeta);
-                todasLasTarjetas.push(tarjeta.querySelector('.dog-card')); // Almacenar la tarjeta
             }
         });
+
+        // Inicializar el buscador
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const clearSearch = document.getElementById('clearSearch');
+
+        if (searchInput && clearSearch && searchButton) {
+            // Eliminar event listeners anteriores si existen
+            searchInput.removeEventListener('input', null);
+            clearSearch.removeEventListener('click', null);
+            searchButton.removeEventListener('click', null);
+
+            // Event listener para el botón de búsqueda
+            searchButton.addEventListener('click', () => {
+                filtrarTarjetas(searchInput.value);
+            });
+
+            // Event listener para buscar al presionar Enter
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    filtrarTarjetas(searchInput.value);
+                }
+            });
+
+            // Event listener para el botón de limpiar búsqueda
+            clearSearch.addEventListener('click', () => {
+                searchInput.value = '';
+                filtrarTarjetas('');
+            });
+        }
+        
+        console.log('Galería cargada y buscador inicializado');
     } catch (error) {
         console.error('Error al cargar la galería:', error);
         alert('Error al cargar la galería de perros. Por favor, intenta de nuevo.');
