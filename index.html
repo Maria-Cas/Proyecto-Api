@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <!-- Meta tags para configuración básica -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Galería de Perros con Vite</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-12 text-center mb-4">
+          <h1 class="display-4">🐕 Galería de Perros Aleatorios 🐕</h1>
+          <button id="obtenerPerro" class="btn btn-primary btn-lg mt-3">Obtener Nuevo Perro</button>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-lg-6">
+          <!-- Contenedor de la imagen -->
+          <div class="dog-container">
+            <img id="dogImage" class="img-fluid rounded shadow" src="" alt="Imagen de perro" style="display: none;">
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <!-- Contenedor de información -->
+          <div class="info-container">
+            <div id="edadInfo" class="info-text card mb-3"></div>
+            <div id="origenInfo" class="info-text origin-info card mb-3"></div>
+            <div id="detallesInfo" class="info-text details-info card"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html> 

@@ -1,0 +1,120 @@
+/* Variables globales y configuración de fuente */
+:root {
+  font-family: Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+/* Estilos base del body */
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+/* Contenedor principal de la aplicación */
+#app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* Contenedor de la imagen del perro */
+.dog-container {
+  margin: 20px 0;
+  transition: all 0.3s ease;
+}
+
+/* Estilos de la imagen */
+.dog-container img {
+  width: 100%;
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.dog-container img:hover {
+  transform: scale(1.02);
+}
+
+/* Contenedor de la información (edad, origen, detalles) */
+.info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+/* Estilo base para todos los textos informativos */
+.info-text {
+  padding: 20px;
+  border: none;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  color: white;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.info-text:not(:empty) {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Color para la información de la raza y edad */
+#edadInfo {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+}
+
+/* Color para la información del origen */
+.origin-info {
+  background: linear-gradient(135deg, #2196F3, #1976D2);
+}
+
+/* Color para los detalles adicionales */
+.details-info {
+  background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+}
+
+/* Estilos del botón */
+.btn-primary {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  border: none;
+  padding: 12px 30px;
+  font-size: 1.1em;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+  background: linear-gradient(135deg, #45a049, #388E3C);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilos para dispositivos móviles */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .info-container {
+    margin-top: 2rem;
+  }
+} 
