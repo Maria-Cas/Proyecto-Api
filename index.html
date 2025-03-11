@@ -9,28 +9,58 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   </head>
   <body>
-    <div class="container py-5">
-      <div class="row justify-content-center">
-        <div class="col-12 text-center mb-4">
-          <h1 class="display-4">🐕 Galería de Perros Aleatorios 🐕</h1>
-          <button id="obtenerPerro" class="btn btn-primary btn-lg mt-3">Obtener Nuevo Perro</button>
+    <div class="container-fluid py-5">
+      <!-- Página Principal -->
+      <div id="paginaPrincipal">
+        <div class="row justify-content-center">
+          <div class="col-12 text-center mb-4">
+            <h1 class="display-4">🐕 Perro del Día 🐕</h1>
+            <div class="mt-4">
+              <button id="irGaleria" class="btn btn-success btn-lg mx-2">Ver Galería</button>
+              <button id="obtenerPerro" class="btn btn-primary btn-lg mx-2">Otro Perro</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mt-4 justify-content-center">
+          <div class="col-lg-10">
+            <div class="featured-dog-container">
+              <div class="row align-items-center">
+                <div class="col-lg-6">
+                  <img id="dogImage" class="img-fluid rounded shadow featured-image" src="" alt="Perro del día" style="display: none;">
+                </div>
+                <div class="col-lg-6">
+                  <div class="info-container">
+                    <p id="breedName" class="breed-name mt-3"></p>
+                    <p id="edadInfo" class="info-text"></p>
+                    <p id="origenInfo" class="info-text origin-info"></p>
+                    <p id="detallesInfo" class="info-text details-info"></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="row mt-4">
-        <div class="col-lg-6">
-          <!-- Contenedor de la imagen -->
-          <div class="dog-container">
-            <img id="dogImage" class="img-fluid rounded shadow" src="" alt="Imagen de perro" style="display: none;">
+      <!-- Galería de Perros -->
+      <div id="galeriaPerros" style="display: none;">
+        <div class="row justify-content-center">
+          <div class="col-12 text-center mb-4">
+            <h1 class="display-4">🐕 Galería de Perros ��</h1>
+            <div class="search-container my-4">
+              <div class="input-group w-75 mx-auto">
+                <input type="text" id="searchInput" class="form-control form-control-lg" placeholder="Buscar raza...">
+                <button id="clearSearch" class="btn btn-outline-secondary" type="button">
+                  <span>&times;</span>
+                </button>
+              </div>
+            </div>
+            <button id="volverInicio" class="btn btn-secondary btn-lg mt-3">Volver al Inicio</button>
           </div>
         </div>
-        <div class="col-lg-6">
-          <!-- Contenedor de información -->
-          <div class="info-container">
-            <div id="edadInfo" class="info-text card mb-3"></div>
-            <div id="origenInfo" class="info-text origin-info card mb-3"></div>
-            <div id="detallesInfo" class="info-text details-info card"></div>
-          </div>
+        <div id="contenedorGaleria" class="row g-4">
+          <!-- Aquí se generarán las tarjetas de perros dinámicamente -->
         </div>
       </div>
     </div>

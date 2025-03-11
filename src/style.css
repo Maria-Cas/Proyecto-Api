@@ -3,6 +3,11 @@
   font-family: Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  --color-primary: #FFB5B5;
+  --color-secondary: #B5D8FF;
+  --color-accent: #D7B5FF;
+  --color-background: #FFF5F5;
+  --color-text: #6B5876;
 }
 
 /* Estilos base del body */
@@ -12,7 +17,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background-color: var(--color-background);
 }
 
 /* Contenedor principal de la aplicación */
@@ -23,40 +28,81 @@ body {
   text-align: center;
 }
 
-/* Contenedor de la imagen del perro */
-.dog-container {
+.container-fluid {
+  max-width: 1400px;
+  padding: 0 2rem;
+}
+
+/* Estilos para la imagen destacada */
+.featured-dog-container {
   margin: 20px 0;
   transition: all 0.3s ease;
 }
 
-/* Estilos de la imagen */
-.dog-container img {
+.featured-image {
   width: 100%;
-  height: auto;
+  height: 600px;
+  object-fit: cover;
   border-radius: 15px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   transition: transform 0.3s ease;
 }
 
-.dog-container img:hover {
+.featured-image:hover {
   transform: scale(1.02);
 }
 
-/* Contenedor de la información (edad, origen, detalles) */
-.info-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 1rem;
+/* Estilos para las tarjetas de la galería */
+.dog-card {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 15px rgba(107, 88, 118, 0.1);
+  cursor: pointer;
 }
 
-/* Estilo base para todos los textos informativos */
+.dog-card:hover {
+  transform: translateY(-5px);
+}
+
+.dog-card .image-container {
+  height: 300px;
+  overflow: hidden;
+}
+
+.dog-card .card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.dog-card:hover .card-image {
+  transform: scale(1.05);
+}
+
+.dog-card .card-content {
+  padding: 1rem;
+  text-align: center;
+  background: white;
+}
+
+.dog-card .card-title {
+  color: var(--color-text);
+  font-size: 1.25rem;
+  margin: 0;
+  font-weight: bold;
+}
+
+/* Estilos para la información */
 .info-text {
-  padding: 20px;
+  padding: 15px;
   border: none;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   border-radius: 10px;
   color: white;
+  font-size: 0.9rem;
   opacity: 0;
   transform: translateY(20px);
   animation: fadeInUp 0.5s ease forwards;
@@ -69,32 +115,62 @@ body {
 
 /* Color para la información de la raza y edad */
 #edadInfo {
-  background: linear-gradient(135deg, #4CAF50, #45a049);
+  background: linear-gradient(135deg, #FFB5B5, #FFA5A5);
 }
 
 /* Color para la información del origen */
 .origin-info {
-  background: linear-gradient(135deg, #2196F3, #1976D2);
+  background: linear-gradient(135deg, #B5D8FF, #A5CAFF);
 }
 
 /* Color para los detalles adicionales */
 .details-info {
-  background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+  background: linear-gradient(135deg, #D7B5FF, #C8A5FF);
 }
 
-/* Estilos del botón */
-.btn-primary {
-  background: linear-gradient(135deg, #4CAF50, #45a049);
-  border: none;
+/* Barra de desplazamiento personalizada */
+.card-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.card-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.card-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.card-content::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* Estilos de los botones */
+.btn {
   padding: 12px 30px;
   font-size: 1.1em;
   transition: all 0.3s ease;
+  border: none;
+  color: #6B5876;
 }
 
-.btn-primary:hover {
+.btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-  background: linear-gradient(135deg, #45a049, #388E3C);
+  box-shadow: 0 4px 15px rgba(107, 88, 118, 0.15);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #FFB5B5, #FFA5A5);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #B5D8FF, #A5CAFF);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #D7B5FF, #C8A5FF);
 }
 
 @keyframes fadeInUp {
@@ -110,11 +186,95 @@ body {
 
 /* Estilos para dispositivos móviles */
 @media (max-width: 768px) {
-  .container {
+  .container-fluid {
     padding: 1rem;
   }
   
   .info-container {
     margin-top: 2rem;
   }
+  
+  .featured-image {
+    height: 400px;
+    margin-bottom: 2rem;
+  }
+  
+  .dog-card {
+    height: auto;
+    min-height: 450px;
+  }
+  
+  .dog-card .image-container {
+    height: 200px;
+  }
+  
+  .dog-card .card-content {
+    padding: 1rem;
+  }
+  
+  .info-text {
+    padding: 12px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Estilos simples para el nombre de la raza */
+.breed-name {
+    font-size: 1.2rem;
+    color: var(--color-text);
+    font-weight: 500;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+    .breed-name {
+        font-size: 1rem;
+    }
+}
+
+/* Estilos para el buscador */
+.search-container {
+  margin: 2rem 0;
+}
+
+.search-container .input-group {
+  box-shadow: 0 4px 15px rgba(107, 88, 118, 0.1);
+}
+
+#searchInput {
+  border: 2px solid var(--color-secondary);
+  border-right: none;
+  background-color: white;
+  color: var(--color-text);
+  font-size: 1.1rem;
+  padding: 0.8rem 1.2rem;
+}
+
+#searchInput:focus {
+  box-shadow: none;
+  border-color: var(--color-accent);
+}
+
+#clearSearch {
+  border: 2px solid var(--color-secondary);
+  border-left: none;
+  color: var(--color-text);
+  background-color: white;
+}
+
+#clearSearch:hover {
+  background-color: var(--color-background);
+  color: var(--color-primary);
+}
+
+#clearSearch span {
+  font-size: 1.5rem;
+  line-height: 1;
+  display: block;
+}
+
+/* Estilo para tarjetas ocultas */
+.dog-card.hidden {
+  display: none;
 } 
