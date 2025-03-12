@@ -216,21 +216,22 @@ function filtrarTarjetas(searchTerm) {
     console.log('Filtrando por:', termino);
     
     // Obtener todas las tarjetas del contenedor
-    const tarjetas = document.querySelectorAll('.col-md-6');
+    const tarjetas = document.querySelectorAll('.dog-card');
     console.log('Número de tarjetas encontradas:', tarjetas.length);
     
     let tarjetasEncontradas = 0;
     
     tarjetas.forEach(tarjeta => {
+        const contenedorTarjeta = tarjeta.closest('.col-md-6');
         // Obtener el texto del título y convertirlo a minúsculas
         const nombreRaza = tarjeta.querySelector('.card-title')?.textContent?.toLowerCase() || '';
         
         // Comprobar si el término está vacío o si el nombre contiene el término
         if (termino === '' || nombreRaza.includes(termino)) {
-            tarjeta.style.display = '';
+            contenedorTarjeta.style.display = '';
             tarjetasEncontradas++;
         } else {
-            tarjeta.style.display = 'none';
+            contenedorTarjeta.style.display = 'none';
         }
     });
     
@@ -266,6 +267,12 @@ async function cargarGaleria() {
         
         contenedorGaleria.innerHTML = '';
         
+        // Crear el contenedor para el mensaje de no resultados
+        const mensajeNoResultados = document.createElement('div');
+        mensajeNoResultados.id = 'mensajeNoResultados';
+        mensajeNoResultados.className = 'col-12 text-center mt-4';
+        mensajeNoResultados.style.display = 'none';
+        
         perros.forEach(perro => {
             if (perro.breeds && perro.breeds.length > 0) {
                 const raza = perro.breeds[0];
@@ -273,6 +280,9 @@ async function cargarGaleria() {
                 contenedorGaleria.appendChild(tarjeta);
             }
         });
+        
+        // Agregar el mensaje de no resultados al final
+        contenedorGaleria.appendChild(mensajeNoResultados);
 
         // Inicializar el buscador
         const searchInput = document.getElementById('searchInput');
@@ -280,26 +290,35 @@ async function cargarGaleria() {
         const clearSearch = document.getElementById('clearSearch');
 
         if (searchInput && clearSearch && searchButton) {
-            // Eliminar event listeners anteriores si existen
-            searchInput.removeEventListener('input', null);
-            clearSearch.removeEventListener('click', null);
-            searchButton.removeEventListener('click', null);
+            // Eliminar event listeners anteriores
+            const nuevoSearchInput = searchInput.cloneNode(true);
+            const nuevoSearchButton = searchButton.cloneNode(true);
+            const nuevoClearSearch = clearSearch.cloneNode(true);
+            
+            searchInput.parentNode.replaceChild(nuevoSearchInput, searchInput);
+            searchButton.parentNode.replaceChild(nuevoSearchButton, searchButton);
+            clearSearch.parentNode.replaceChild(nuevoClearSearch, clearSearch);
+
+            // Event listener para el input de búsqueda
+            nuevoSearchInput.addEventListener('input', (e) => {
+                filtrarTarjetas(e.target.value);
+            });
 
             // Event listener para el botón de búsqueda
-            searchButton.addEventListener('click', () => {
-                filtrarTarjetas(searchInput.value);
+            nuevoSearchButton.addEventListener('click', () => {
+                filtrarTarjetas(nuevoSearchInput.value);
             });
 
             // Event listener para buscar al presionar Enter
-            searchInput.addEventListener('keypress', (e) => {
+            nuevoSearchInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
-                    filtrarTarjetas(searchInput.value);
+                    filtrarTarjetas(nuevoSearchInput.value);
                 }
             });
 
             // Event listener para el botón de limpiar búsqueda
-            clearSearch.addEventListener('click', () => {
-                searchInput.value = '';
+            nuevoClearSearch.addEventListener('click', () => {
+                nuevoSearchInput.value = '';
                 filtrarTarjetas('');
             });
         }
