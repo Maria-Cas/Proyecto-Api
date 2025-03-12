@@ -44,12 +44,16 @@ async function obtenerImagenPerro() {
         const origenInfo = document.getElementById('origenInfo');
         const detallesInfo = document.getElementById('detallesInfo');
         const breedName = document.getElementById('breedName');
+        const contenedorImagenes = document.getElementById('additionalImages');
 
         // Verificar si los elementos existen
-        if (!imagen || !edadInfo || !origenInfo || !detallesInfo || !breedName) {
+        if (!imagen || !edadInfo || !origenInfo || !detallesInfo || !breedName || !contenedorImagenes) {
             console.error('No se encontraron todos los elementos necesarios en el DOM');
             return;
         }
+
+        // Limpiar las imágenes adicionales y mostrar mensaje de carga
+        contenedorImagenes.innerHTML = '<p class="text-center">Cargando...</p>';
 
         // Realizamos la petición a la API
         const respuesta = await fetch('https://api.thedogapi.com/v1/images/search?has_breeds=1', {
@@ -102,15 +106,29 @@ async function obtenerImagenPerro() {
                 detallesInfo.innerHTML = detalles.join('<br>');
                 detallesInfo.style.display = 'block';
             }
+
+            // Obtener y mostrar imágenes adicionales
+            console.log('Obteniendo imágenes adicionales para la raza principal:', raza.name, 'ID:', raza.id);
+            if (raza.id) {
+                const imagenesAdicionales = await obtenerImagenesAdicionales(raza.id);
+                mostrarImagenesAdicionales(imagenesAdicionales, data.url);
+            } else {
+                contenedorImagenes.innerHTML = '<p class="text-center text-muted">No se pueden obtener imágenes adicionales</p>';
+            }
         } else {
             console.log('La imagen no tiene información de raza');
             edadInfo.style.display = 'none';
             origenInfo.style.display = 'none';
             detallesInfo.style.display = 'none';
             breedName.textContent = 'Raza no disponible';
+            contenedorImagenes.innerHTML = '<p class="text-center text-muted">No hay información de raza disponible</p>';
         }
     } catch (error) {
         console.error('Error detallado:', error);
+        const contenedorImagenes = document.getElementById('additionalImages');
+        if (contenedorImagenes) {
+            contenedorImagenes.innerHTML = '<p class="text-center text-danger">Error al cargar las imágenes adicionales</p>';
+        }
         alert('¡Ups! Hubo un error al obtener la información del perro. Por favor, intenta de nuevo.');
     }
 }
@@ -298,8 +316,9 @@ function crearTarjetaPerro(imagenUrl, nombreRaza, breed) {
     const col = document.createElement('div');
     col.className = 'col-md-6 col-lg-4 mb-4';
     
+    // Guardamos el ID de la raza en un atributo de datos
     col.innerHTML = `
-        <div class="dog-card">
+        <div class="dog-card" data-breed-id="${breed.id}">
             <div class="image-container">
                 <img src="${imagenUrl}" class="card-image" alt="${nombreRaza}">
             </div>
@@ -311,23 +330,163 @@ function crearTarjetaPerro(imagenUrl, nombreRaza, breed) {
     
     // Añadir evento click para mostrar detalles
     col.querySelector('.dog-card').addEventListener('click', () => {
+        console.log('Click en tarjeta, breed:', breed);
         mostrarDetallesPerro(imagenUrl, breed);
     });
     
     return col;
 }
 
-// Función para mostrar los detalles de un perro al hacer click
-function mostrarDetallesPerro(imagenUrl, breed) {
-    document.getElementById('dogImage').src = imagenUrl;
-    document.getElementById('dogImage').style.display = 'block';
-    
-    const edadMedia = calcularEdadMedia(breed);
-    mostrarEdadMedia(breed.name, edadMedia);
-    mostrarOrigen(breed);
-    mostrarDetallesRaza(breed);
-    
-    cambiarVista('paginaPrincipal');
+// Función para obtener imágenes adicionales de la misma raza
+async function obtenerImagenesAdicionales(breedId) {
+    try {
+        console.log('Obteniendo imágenes adicionales para breed_id:', breedId);
+        // Usamos el endpoint correcto para obtener imágenes por raza
+        const respuesta = await fetch(`https://api.thedogapi.com/v1/images/search?breed_ids=${breedId}&limit=10`, {
+            headers: {
+                'x-api-key': API_KEY
+            }
+        });
+        
+        if (!respuesta.ok) {
+            throw new Error(`Error en la respuesta de la API: ${respuesta.status}`);
+        }
+        
+        const imagenes = await respuesta.json();
+        console.log('Respuesta completa de la API:', imagenes);
+        return imagenes;
+    } catch (error) {
+        console.error('Error al obtener imágenes adicionales:', error);
+        return [];
+    }
+}
+
+// Función para mostrar las imágenes adicionales
+function mostrarImagenesAdicionales(imagenes, imagenPrincipalUrl) {
+    const contenedorImagenes = document.getElementById('additionalImages');
+    if (!contenedorImagenes) {
+        console.error('No se encontró el contenedor de imágenes adicionales');
+        return;
+    }
+
+    // Limpiar el contenedor antes de agregar nuevas imágenes
+    contenedorImagenes.innerHTML = '';
+
+    if (!imagenes || imagenes.length === 0) {
+        console.log('No se encontraron imágenes adicionales');
+        contenedorImagenes.innerHTML = '<p class="text-center text-muted">No hay imágenes adicionales disponibles</p>';
+        return;
+    }
+
+    // Crear una fila para las imágenes
+    const row = document.createElement('div');
+    row.className = 'row g-2';
+
+    // Filtrar imágenes válidas
+    const imagenesUnicas = imagenes
+        .filter(img => 
+            img.url !== imagenPrincipalUrl && // No repetir la imagen principal
+            img.url && // Asegurarse de que tiene URL
+            img.breeds && 
+            img.breeds.length > 0 // Asegurarse de que tiene información de raza
+        )
+        .slice(0, 3);
+
+    console.log(`Mostrando ${imagenesUnicas.length} imágenes únicas`);
+
+    if (imagenesUnicas.length === 0) {
+        contenedorImagenes.innerHTML = '<p class="text-center text-muted">No hay imágenes adicionales disponibles</p>';
+        return;
+    }
+
+    imagenesUnicas.forEach(imagen => {
+        const col = document.createElement('div');
+        col.className = 'col-4';
+        
+        const img = document.createElement('img');
+        img.src = imagen.url;
+        img.alt = imagen.breeds[0]?.name || 'Imagen adicional';
+        img.className = 'img-fluid additional-image';
+        img.style.cursor = 'pointer';
+        
+        // Agregar evento click para cambiar la imagen principal
+        img.addEventListener('click', () => {
+            const imagenPrincipal = document.getElementById('dogImage');
+            if (imagenPrincipal) {
+                imagenPrincipal.src = imagen.url;
+            }
+        });
+        
+        col.appendChild(img);
+        row.appendChild(col);
+    });
+
+    contenedorImagenes.appendChild(row);
+}
+
+// Modificar la función mostrarDetallesPerro para incluir las imágenes adicionales
+async function mostrarDetallesPerro(imagenUrl, breed) {
+    try {
+        console.log('Mostrando detalles del perro:', breed);
+        console.log('ID de la raza:', breed.id);
+        
+        // Cambiar a la vista principal primero para mejor experiencia
+        cambiarVista('paginaPrincipal');
+        
+        // Mostrar imagen principal
+        const imagenPrincipal = document.getElementById('dogImage');
+        if (imagenPrincipal) {
+            imagenPrincipal.src = imagenUrl;
+            imagenPrincipal.style.display = 'block';
+        }
+        
+        // Actualizar el nombre de la raza
+        const breedName = document.getElementById('breedName');
+        if (breedName) {
+            breedName.textContent = breed.name;
+        }
+        
+        // Mostrar información de la raza
+        const edadMedia = calcularEdadMedia(breed);
+        mostrarEdadMedia(breed.name, edadMedia);
+        mostrarOrigen(breed);
+        mostrarDetallesRaza(breed);
+        
+        // Limpiar las imágenes adicionales existentes y mostrar mensaje de carga
+        const contenedorImagenes = document.getElementById('additionalImages');
+        if (contenedorImagenes) {
+            contenedorImagenes.innerHTML = '<p class="text-center">Cargando imágenes adicionales...</p>';
+        }
+        
+        // Obtener y mostrar imágenes adicionales
+        if (!breed.id) {
+            console.error('No se encontró ID de raza:', breed);
+            if (contenedorImagenes) {
+                contenedorImagenes.innerHTML = '<p class="text-center text-muted">No se pueden obtener imágenes adicionales</p>';
+            }
+            return;
+        }
+        
+        console.log('Obteniendo imágenes adicionales para:', breed.name, 'ID:', breed.id);
+        const imagenesAdicionales = await obtenerImagenesAdicionales(breed.id);
+        
+        if (!imagenesAdicionales || imagenesAdicionales.length === 0) {
+            console.log('No se encontraron imágenes adicionales para la raza:', breed.name);
+            if (contenedorImagenes) {
+                contenedorImagenes.innerHTML = '<p class="text-center text-muted">No hay imágenes adicionales disponibles</p>';
+            }
+            return;
+        }
+        
+        mostrarImagenesAdicionales(imagenesAdicionales, imagenUrl);
+        
+    } catch (error) {
+        console.error('Error al mostrar detalles del perro:', error);
+        const contenedorImagenes = document.getElementById('additionalImages');
+        if (contenedorImagenes) {
+            contenedorImagenes.innerHTML = '<p class="text-center text-danger">Error al cargar las imágenes adicionales</p>';
+        }
+    }
 }
 
 // Función para cambiar entre vistas
