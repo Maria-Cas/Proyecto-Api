@@ -58,11 +58,17 @@ async function obtenerImagenPerro() {
         // Realizamos la petición a la API
         const respuesta = await fetch('https://api.thedogapi.com/v1/images/search?has_breeds=1', {
             headers: {
-                'x-api-key': API_KEY
-            }
+                'x-api-key': API_KEY,
+                'Content-Type': 'application/json'
+            },
+            mode: 'cors'
         });
+
+        if (!respuesta.ok) {
+            throw new Error(`HTTP error! status: ${respuesta.status}`);
+        }
+
         const [data] = await respuesta.json();
-        
         console.log('Datos recibidos de la API:', data);
         
         // Mostramos la imagen
@@ -260,10 +266,18 @@ async function cargarGaleria() {
     try {
         const respuesta = await fetch('https://api.thedogapi.com/v1/images/search?has_breeds=1&limit=20', {
             headers: {
-                'x-api-key': API_KEY
-            }
+                'x-api-key': API_KEY,
+                'Content-Type': 'application/json'
+            },
+            mode: 'cors'
         });
+        
+        if (!respuesta.ok) {
+            throw new Error(`HTTP error! status: ${respuesta.status}`);
+        }
+        
         const perros = await respuesta.json();
+        console.log('Perros recibidos:', perros);
         
         contenedorGaleria.innerHTML = '';
         
@@ -326,7 +340,7 @@ async function cargarGaleria() {
         console.log('Galería cargada y buscador inicializado');
     } catch (error) {
         console.error('Error al cargar la galería:', error);
-        alert('Error al cargar la galería de perros. Por favor, intenta de nuevo.');
+        contenedorGaleria.innerHTML = '<div class="alert alert-danger">Error al cargar las imágenes. Por favor, intenta de nuevo.</div>';
     }
 }
 
@@ -360,11 +374,12 @@ function crearTarjetaPerro(imagenUrl, nombreRaza, breed) {
 async function obtenerImagenesAdicionales(breedId) {
     try {
         console.log('Obteniendo imágenes adicionales para breed_id:', breedId);
-        // Usamos el endpoint correcto para obtener imágenes por raza
         const respuesta = await fetch(`https://api.thedogapi.com/v1/images/search?breed_ids=${breedId}&limit=10`, {
             headers: {
-                'x-api-key': API_KEY
-            }
+                'x-api-key': API_KEY,
+                'Content-Type': 'application/json'
+            },
+            mode: 'cors'
         });
         
         if (!respuesta.ok) {
